@@ -15,9 +15,9 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         
-        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 15px; overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 15px; }
         
-        .container { width: 100%; max-width: 1000px; padding: 20px; position: relative; }
+        .container { width: 100%; max-width: 1000px; position: relative; }
         
         header { margin-bottom: 30px; border-left: 3px solid var(--accent); padding-left: 20px; }
         header h1 { font-size: clamp(20px, 5vw, 32px); }
@@ -32,83 +32,66 @@
         }
         
         label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #666; display: block; margin-bottom: 8px; letter-spacing: 1px; }
-        input, select { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 4px; outline: none; width: 100%; font-size: 14px; transition: border 0.3s; }
-        input:focus { border-color: var(--accent); }
+        input, select { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 4px; outline: none; width: 100%; font-size: 14px; }
 
         /* Hedef Seçim Kartları */
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
-        .card { background: var(--surface); border: 1px solid var(--border); padding: 20px 10px; border-radius: 4px; cursor: pointer; transition: 0.3s; text-align: center; }
-        .card h3 { font-size: 14px; margin-bottom: 5px; }
-        .card p { font-size: 11px; opacity: 0.6; }
-        .card.selected { background: var(--accent); color: #000; border-color: var(--accent); }
+        .card { background: var(--surface); border: 1px solid var(--border); padding: 15px; border-radius: 4px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .card h3 { font-size: 13px; }
+        .card p { font-size: 10px; opacity: 0.6; }
+        .card.selected { background: var(--accent); color: #000; }
 
         /* Butonlar */
-        .btn { padding: 18px 30px; font-weight: 800; text-transform: uppercase; cursor: pointer; border-radius: 4px; border: none; font-size: 11px; letter-spacing: 1px; }
+        .btn { padding: 18px 25px; font-weight: 800; text-transform: uppercase; cursor: pointer; border-radius: 4px; border: none; font-size: 11px; }
         .btn-main { background: var(--accent); color: #000; width: 100%; }
-        .btn:active { transform: scale(0.98); }
 
         /* Sonuç Paneli */
         #ui-result { display: none; margin-top: 20px; }
         #ui-result.active { display: block; }
         
+        /* Çıktı Alınacak Alan - Export Esnasında Sabit Genişlik Verilecek */
         #report-area { 
             background: #000; 
-            padding: 40px 30px; 
+            padding: 40px; 
             border: 1px solid var(--border); 
             border-radius: 8px; 
             display: grid; 
             grid-template-columns: 1.2fr 0.8fr; 
-            gap: 30px; 
+            gap: 30px;
+            width: 100%;
         }
 
-        .big-val { font-size: clamp(45px, 10vw, 70px); font-weight: 800; letter-spacing: -3px; line-height: 1; margin: 15px 0; }
-        
-        .macro-container { display: flex; gap: 15px; margin: 25px 0; }
-        .macro-box { flex: 1; }
-        .macro-box h3 { font-size: clamp(18px, 4vw, 24px); font-weight: 800; }
+        .big-val { font-size: clamp(40px, 10vw, 70px); font-weight: 800; letter-spacing: -3px; margin: 10px 0; }
+        .macro-container { display: flex; gap: 15px; margin: 20px 0; }
+        .macro-box h3 { font-size: 22px; font-weight: 800; }
 
-        .logic-item { padding: 15px; background: rgba(255,255,255,0.03); border-left: 2px solid var(--accent); margin-top: 15px; }
-        .logic-item h5 { font-size: 9px; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
-        .logic-item p { font-size: 13px; color: #bbb; line-height: 1.5; }
+        .logic-item { padding: 12px; background: rgba(255,255,255,0.03); border-left: 2px solid var(--accent); margin-top: 10px; }
+        .logic-item h5 { font-size: 9px; color: var(--accent); margin-bottom: 4px; }
+        .logic-item p { font-size: 12px; color: #bbb; }
 
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 25px; }
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 20px; }
 
-        /* MOBİL & TABLET ADAPTASYONU */
+        /* MOBİL AYARLARI */
         @media (max-width: 768px) {
-            #report-area { grid-template-columns: 1fr; text-align: center; padding: 30px 20px; }
-            .grid { grid-template-columns: 1fr; } 
-            .macro-container { justify-content: center; }
-            .logic-item { text-align: left; }
-            .chart-wrapper { order: -1; margin-bottom: 20px; }
-            header { text-align: center; border-left: none; border-bottom: 2px solid var(--accent); padding: 0 0 15px 0; }
+            #report-area { grid-template-columns: 1fr; padding: 25px; }
+            .grid { grid-template-columns: 1fr; }
+            .chart-side { order: -1; }
+            header { text-align: center; border: none; padding: 0; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
         }
 
-        .chart-wrapper { position: relative; width: 100%; max-width: 280px; margin: 0 auto; }
+        .chart-wrapper { position: relative; width: 260px; height: 260px; margin: 0 auto; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="ui-setup">
-        <header>
-            <span class="brand">Pro Nutrition Logic</span>
-            <h1>Analiz Sistemi.</h1>
-        </header>
+        <header><span class="brand">Pro Nutrition Logic</span><h1>Analiz Sistemi.</h1></header>
         
         <div class="field-group">
             <div><label>İsim</label><input type="text" id="name" placeholder="Eray Yılmaz"></div>
-            <div>
-                <label>Cinsiyet</label>
-                <select id="gen" onchange="toggleThemes()">
-                    <option value="none">Seçiniz</option>
-                    <option value="male">Erkek</option>
-                    <option value="female">Kadın</option>
-                </select>
-            </div>
-            <div id="t-wrap" style="display:none;">
-                <label>Tema</label>
-                <select id="t-pick" onchange="applyT()"></select>
-            </div>
+            <div><label>Cinsiyet</label><select id="gen" onchange="toggleThemes()"><option value="none">Seçiniz</option><option value="male">Erkek</option><option value="female">Kadın</option></select></div>
+            <div id="t-wrap" style="display:none;"><label>Tema</label><select id="t-pick" onchange="applyT()"></select></div>
         </div>
 
         <div class="field-group">
@@ -118,33 +101,16 @@
         </div>
 
         <div class="field-group">
-            <div>
-                <label>Egzersiz Frekansı</label>
-                <select id="freq">
-                    <option value="1.2">1-2 Gün (Sedanter)</option>
-                    <option value="1.4" selected>3-4 Gün (Orta)</option>
-                    <option value="1.6">5-6 Gün (Aktif)</option>
-                    <option value="1.8">Profesyonel / Ağır</option>
-                </select>
-            </div>
-            <div>
-                <label>Antrenman Türü</label>
-                <select id="style">
-                    <option>Ağırlık Antrenmanı</option>
-                    <option>Kardiyo</option>
-                    <option>Vücut Ağırlığı</option>
-                    <option>HIIT</option>
-                </select>
-            </div>
+            <div><label>Hareketlilik</label><select id="freq"><option value="1.2">Az (1-2 gün)</option><option value="1.4" selected>Orta (3-4 gün)</option><option value="1.6">Çok (5-6 gün)</option><option value="1.8">Pro (7+ gün)</option></select></div>
+            <div><label>Tür</label><select id="style"><option>Ağırlık</option><option>Kardiyo</option><option>HIIT</option></select></div>
         </div>
 
         <div class="grid">
-            <div class="card" onclick="setG(this, 'fat')"><h3>Defisit</h3><p>Yağ Yakımı</p></div>
-            <div class="card" onclick="setG(this, 'muscle')"><h3>Surplus</h3><p>Kas Artışı</p></div>
-            <div class="card" onclick="setG(this, 'recomp')"><h3>Denge</h3><p>Koruma</p></div>
+            <div class="card" onclick="setG(this, 'fat')"><h3>Yağ Yakımı</h3><p>Defisit</p></div>
+            <div class="card" onclick="setG(this, 'muscle')"><h3>Kas Artışı</h3><p>Surplus</p></div>
+            <div class="card" onclick="setG(this, 'recomp')"><h3>Koruma</h3><p>Denge</p></div>
         </div>
-
-        <button class="btn btn-main" onclick="calc()">Raporu Hazırla</button>
+        <button class="btn btn-main" onclick="calc()">Raporu Oluştur</button>
     </div>
 
     <div id="ui-result">
@@ -152,35 +118,26 @@
             <div class="info-side">
                 <span class="brand">Biyometrik Sonuçlar</span>
                 <div class="big-val" id="out-cal">0</div>
-                
                 <div class="macro-container">
-                    <div class="macro-box"><label style="color:var(--prot)">Protein</label><h3 id="out-p" style="color:var(--prot)">0</h3></div>
-                    <div class="macro-box"><label style="color:var(--fat)">Yağ</label><h3 id="out-f" style="color:var(--fat)">0</h3></div>
-                    <div class="macro-box"><label style="color:var(--carb)">Karb</label><h3 id="out-c" style="color:var(--carb)">0</h3></div>
+                    <div class="macro-box"><label style="color:var(--prot)">Protein</label><h3 id="out-p">0</h3></div>
+                    <div class="macro-box"><label style="color:var(--fat)">Yağ</label><h3 id="out-f">0</h3></div>
+                    <div class="macro-box"><label style="color:var(--carb)">Karb</label><h3 id="out-c">0</h3></div>
                 </div>
-
                 <div class="logic-panel">
-                    <div class="logic-item"><h5>Günlük İhtiyaç (TDEE)</h5><p id="l-tdee"></p></div>
-                    <div class="logic-item"><h5>Değişim Stratejisi</h5><p id="l-diff"></p></div>
-                    <div class="logic-item"><h5>Analitik Mantık</h5><p id="l-reason"></p></div>
+                    <div class="logic-item"><h5>Bakım Kalorisi</h5><p id="l-tdee"></p></div>
+                    <div class="logic-item"><h5>Strateji</h5><p id="l-diff"></p></div>
+                    <div class="logic-item"><h5>Analiz</h5><p id="l-reason"></p></div>
                 </div>
             </div>
-
-            <div class="chart-side" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                <div class="chart-wrapper">
-                    <canvas id="macroChart"></canvas>
-                </div>
-                <div style="margin-top:25px; text-align:center;">
-                    <label>Sporcu Kimliği</label>
-                    <p id="r-name" style="font-size:18px; font-weight:800; text-transform:uppercase;"></p>
-                </div>
+            <div class="chart-side">
+                <div class="chart-wrapper"><canvas id="macroChart"></canvas></div>
+                <div style="margin-top:20px; text-align:center;"><label>Sporcu</label><p id="r-name" style="font-weight:800;"></p></div>
             </div>
         </div>
 
         <div class="controls">
-            <button class="btn btn-main" onclick="exportFile('pdf')">PDF İndir</button>
-            <button class="btn btn-main" style="background:transparent; color:#fff; border:1px solid var(--border);" onclick="exportFile('img')">Görsel Kaydet</button>
-            <button class="btn btn-main" style="background:#333; color:#fff;" onclick="location.reload()">Yeni Analiz</button>
+            <button class="btn btn-main" style="background:#222; color:#fff;" onclick="exportFile('img')">GÖRSEL</button>
+            <button class="btn btn-main" style="background:#444; color:#fff;" onclick="location.reload()">SIFIRLA</button>
         </div>
     </div>
 </div>
@@ -189,64 +146,29 @@
     let goal = null, chart = null;
     Chart.register(ChartDataLabels);
 
-    function setG(el, g) { 
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected')); 
-        el.classList.add('selected'); 
-        goal = g; 
-    }
-
+    function setG(el, g) { document.querySelectorAll('.card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); goal = g; }
+    
     function toggleThemes() {
-        const g = document.getElementById('gen').value; 
-        const w = document.getElementById('t-wrap'); 
-        const p = document.getElementById('t-pick');
+        const g = document.getElementById('gen').value; const w = document.getElementById('t-wrap'); const p = document.getElementById('t-pick');
         if(g === "none") { w.style.display="none"; return; }
         w.style.display="block"; p.innerHTML = "";
-        const t = { male: ["#ffffff", "#3b82f6", "#00ff88"], female: ["#ffffff", "#ff0077", "#D4AF37"] };
-        t[g].forEach((c, i) => { 
-            let o = document.createElement('option'); 
-            o.value=c; 
-            o.innerText=`Tema ${i+1}`; 
-            p.appendChild(o); 
-        });
+        const t = { male: ["#ffffff", "#3b82f6", "#4ade80"], female: ["#ffffff", "#ff0077", "#facc15"] };
+        t[g].forEach((c, i) => { let o = document.createElement('option'); o.value=c; o.innerText=`Tema ${i+1}`; p.appendChild(o); });
         applyT();
     }
-
-    function applyT() { 
-        const c = document.getElementById('t-pick').value; 
-        document.documentElement.style.setProperty('--accent', c); 
-    }
+    function applyT() { document.documentElement.style.setProperty('--accent', document.getElementById('t-pick').value); }
 
     function calc() {
-        if(!goal) return alert("Lütfen bir hedef seçin!");
-        const w = +document.getElementById('w').value, 
-              h = +document.getElementById('h').value, 
-              a = +document.getElementById('a').value, 
-              f = +document.getElementById('freq').value, 
-              g = document.getElementById('gen').value,
-              name = document.getElementById('name').value;
+        if(!goal) return alert("Hedef seç!");
+        const w = +document.getElementById('w').value, h = +document.getElementById('h').value, a = +document.getElementById('a').value, f = +document.getElementById('freq').value, g = document.getElementById('gen').value;
+        if(!w || !h || !a) return alert("Eksik bilgi!");
 
-        if(!w || !h || !a || g === "none") return alert("Lütfen tüm alanları doldurun!");
-
-        // Mifflin-St Jeor Formülü
         let bmr = (10 * w) + (6.25 * h) - (5 * a) + (g === 'female' ? -161 : 5);
-        let tdee = bmr * f;
-        let final, p, fa, c, dTxt, rTxt;
+        let tdee = bmr * f, final, p, fa, c, dTxt, rTxt;
 
-        if (goal === 'fat') { 
-            final = tdee - 500; p = w * 2.2; fa = w * 0.7; 
-            dTxt = "-500 kcal açık uygulandı."; 
-            rTxt = "Yağ yakımı odaklı, kas koruyucu yüksek protein dengesi."; 
-        }
-        else if (goal === 'muscle') { 
-            final = tdee + 300; p = w * 1.8; fa = w * 0.8; 
-            dTxt = "+300 kcal sürplus eklendi."; 
-            rTxt = "Kas hipertrofisi için optimize edilmiş kontrollü enerji artışı."; 
-        }
-        else { 
-            final = tdee; p = w * 2.0; fa = w * 0.8; 
-            dTxt = "Kalori dengesi korundu."; 
-            rTxt = "Vücut kompozisyonunu iyileştirme ve mevcut kütleyi koruma."; 
-        }
+        if (goal === 'fat') { final = tdee - 500; p = w * 2.2; fa = w * 0.7; dTxt = "-500 kcal açık."; rTxt = "Yağ yakımı ve kas koruma."; }
+        else if (goal === 'muscle') { final = tdee + 300; p = w * 1.8; fa = w * 0.8; dTxt = "+300 kcal sürplus."; rTxt = "Kas gelişimi odaklı."; }
+        else { final = tdee; p = w * 2.0; fa = w * 0.8; dTxt = "Stabil denge."; rTxt = "Form koruma ve gelişim."; }
         
         c = (final - (p*4 + fa*9)) / 4;
 
@@ -256,49 +178,52 @@
         document.getElementById('out-p').innerText = Math.round(p) + "g";
         document.getElementById('out-f').innerText = Math.round(fa) + "g";
         document.getElementById('out-c').innerText = Math.round(c) + "g";
-        document.getElementById('l-tdee').innerText = `${Math.round(tdee)} kcal (Bakım)`;
+        document.getElementById('l-tdee').innerText = Math.round(tdee) + " kcal";
         document.getElementById('l-diff').innerText = dTxt;
         document.getElementById('l-reason').innerText = rTxt;
-        document.getElementById('r-name').innerText = name || "Elite Athlete";
+        document.getElementById('r-name').innerText = document.getElementById('name').value || "ELITE ATHLETE";
         
-        const ctx = document.getElementById('macroChart').getContext('2d');
         if(chart) chart.destroy();
-        chart = new Chart(ctx, {
+        chart = new Chart(document.getElementById('macroChart'), {
             type: 'doughnut',
             data: {
-                labels: ['Protein', 'Yağ', 'Karb'],
-                datasets: [{
-                    data: [Math.round(p*4), Math.round(fa*9), Math.round(c*4)],
-                    backgroundColor: ['#4ade80', '#facc15', '#ef4444'],
-                    borderWidth: 0
-                }]
+                labels: ['P', 'Y', 'K'],
+                datasets: [{ data: [Math.round(p*4), Math.round(fa*9), Math.round(c*4)], backgroundColor: ['#4ade80', '#facc15', '#ef4444'], borderWidth: 0 }]
             },
-            options: {
-                cutout: '75%',
-                plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                        color: '#fff',
-                        font: { weight: '800', size: 10 },
-                        formatter: (val, ctx) => ctx.chart.data.labels[ctx.dataIndex]
-                    }
-                }
-            }
+            options: { cutout: '75%', plugins: { legend: { display: false }, datalabels: { color: '#fff', font: { weight: 'bold' } } } }
         });
     }
 
-    async function exportFile(t) {
+    async function exportFile(type) {
         const area = document.getElementById('report-area');
-        const canvas = await html2canvas(area, {backgroundColor:'#000', scale:2});
-        if(t==='img'){ 
-            let l=document.createElement('a'); l.download='Analiz-Raporu.png'; 
-            l.href=canvas.toDataURL(); l.click(); 
-        }
-        else { 
-            const {jsPDF}=window.jspdf; 
-            const p=new jsPDF('l','mm','a4'); 
-            p.addImage(canvas.toDataURL('image/png'),'PNG',10,10,277,0); 
-            p.save("Analiz-Raporu.pdf"); 
+        
+        // MOBİL DÜZELTME: Render sırasında alanı genişletiyoruz
+        const originalStyle = area.style.cssText;
+        area.style.width = "1000px"; // Masaüstü genişliğine zorla
+        area.style.position = "fixed";
+        area.style.left = "-10000px"; // Ekrandan gizle ama render edilsin
+        
+        const canvas = await html2canvas(area, {
+            backgroundColor: '#000',
+            scale: 2,
+            logging: false,
+            useCORS: true,
+            width: 1000 // Çıktı genişliğini sabitle
+        });
+
+        area.style.cssText = originalStyle; // Eski haline getir
+
+        if(type === 'img') {
+            let link = document.createElement('a');
+            link.download = 'Analiz.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        } else {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4');
+            const imgData = canvas.toDataURL('image/png');
+            pdf.addImage(imgData, 'PNG', 10, 10, 277, 0);
+            pdf.save("Analiz-Raporu.pdf");
         }
     }
 </script>
