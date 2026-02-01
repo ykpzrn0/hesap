@@ -2,303 +2,305 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Performance Lab v3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root {
-            --gym-glow: rgba(255, 60, 0, 0.4);
-            --rest-glow: rgba(0, 242, 255, 0.4);
-            --profile-glow: rgba(255, 255, 255, 0.15);
-            --bg-dark: #030303;
-            --accent: #ff3c00;
-            --error-red: #ff0033;
+        :root { 
+            --bg: #000; --surface: #0a0a0a; --accent: #fff; --border: rgba(255,255,255,0.1); --text: #fff; 
+            --prot: #4ade80; --fat: #facc15; --carb: #ef4444; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 15px; overflow-x: hidden; }
+        
+        .container { width: 100%; max-width: 1000px; padding: 20px; position: relative; }
+        
+        header { margin-bottom: 30px; border-left: 3px solid var(--accent); padding-left: 20px; }
+        header h1 { font-size: clamp(20px, 5vw, 32px); }
+        .brand { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+
+        /* Form Grupları */
+        .field-group { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        
+        label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #666; display: block; margin-bottom: 8px; letter-spacing: 1px; }
+        input, select { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 4px; outline: none; width: 100%; font-size: 14px; transition: border 0.3s; }
+        input:focus { border-color: var(--accent); }
+
+        /* Hedef Seçim Kartları */
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
+        .card { background: var(--surface); border: 1px solid var(--border); padding: 20px 10px; border-radius: 4px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .card h3 { font-size: 14px; margin-bottom: 5px; }
+        .card p { font-size: 11px; opacity: 0.6; }
+        .card.selected { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        /* Butonlar */
+        .btn { padding: 18px 30px; font-weight: 800; text-transform: uppercase; cursor: pointer; border-radius: 4px; border: none; font-size: 11px; letter-spacing: 1px; }
+        .btn-main { background: var(--accent); color: #000; width: 100%; }
+        .btn:active { transform: scale(0.98); }
+
+        /* Sonuç Paneli */
+        #ui-result { display: none; margin-top: 20px; }
+        #ui-result.active { display: block; }
+        
+        #report-area { 
+            background: #000; 
+            padding: 40px 30px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            display: grid; 
+            grid-template-columns: 1.2fr 0.8fr; 
+            gap: 30px; 
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .big-val { font-size: clamp(45px, 10vw, 70px); font-weight: 800; letter-spacing: -3px; line-height: 1; margin: 15px 0; }
+        
+        .macro-container { display: flex; gap: 15px; margin: 25px 0; }
+        .macro-box { flex: 1; }
+        .macro-box h3 { font-size: clamp(18px, 4vw, 24px); font-weight: 800; }
 
-        body {
-            background: var(--bg-dark);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #0a0a0a, #000);
-            padding: 20px;
+        .logic-item { padding: 15px; background: rgba(255,255,255,0.03); border-left: 2px solid var(--accent); margin-top: 15px; }
+        .logic-item h5 { font-size: 9px; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+        .logic-item p { font-size: 13px; color: #bbb; line-height: 1.5; }
+
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 25px; }
+
+        /* MOBİL & TABLET ADAPTASYONU */
+        @media (max-width: 768px) {
+            #report-area { grid-template-columns: 1fr; text-align: center; padding: 30px 20px; }
+            .grid { grid-template-columns: 1fr; } 
+            .macro-container { justify-content: center; }
+            .logic-item { text-align: left; }
+            .chart-wrapper { order: -1; margin-bottom: 20px; }
+            header { text-align: center; border-left: none; border-bottom: 2px solid var(--accent); padding: 0 0 15px 0; }
         }
 
-        /* --- HATA MESAJI KARTI (TOAST) --- */
-        #error-toast {
-            position: fixed;
-            top: -100px; /* Başlangıçta ekranın dışında */
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(20, 0, 0, 0.9);
-            border: 1px solid var(--error-red);
-            padding: 15px 30px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 9999;
-            box-shadow: 0 0 30px rgba(255, 0, 51, 0.2);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        #error-toast.show { top: 30px; } /* Aktif olduğunda aşağı iner */
-
-        .error-icon { color: var(--error-red); width: 20px; height: 20px; }
-        .error-text { font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #fff; }
-
-        /* GİRİŞ FORMU */
-        #setup-screen {
-            width: 100%;
-            max-width: 500px;
-            background: #080808;
-            padding: 40px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.65rem; text-transform: uppercase; color: #555; margin-bottom: 5px; letter-spacing: 1px; font-weight: 800; }
-        
-        input, select {
-            width: 100%; background: #111; border: 1px solid #222; padding: 12px; 
-            color: white; border-radius: 10px; outline: none; transition: 0.3s;
-            font-family: inherit;
-        }
-        input:focus, select:focus { border-color: var(--accent); }
-
-        .btn-calc {
-            width: 100%; padding: 18px; background: var(--accent); border: none; 
-            color: white; font-weight: 800; border-radius: 12px; cursor: pointer;
-            letter-spacing: 2px; transition: 0.4s; margin-top: 20px;
-        }
-
-        /* DASHBOARD */
-        #dashboard { display: none; opacity: 0; transition: opacity 0.8s ease; width: 100%; max-width: 840px; }
-        .main-wrapper { display: flex; flex-direction: column; gap: 30px; width: 100%; }
-        .container { display: flex; gap: 40px; perspective: 1500px; }
-
-        .card { position: relative; background: #080808; border: 1px solid rgba(255,255,255,0.03); transform-style: preserve-3d; transition: transform 0.3s; overflow: hidden; border-radius: 40px; }
-        .profile-card { width: 100%; padding: 35px 45px; display: flex; justify-content: space-between; align-items: center; }
-        .info-card { width: 400px; padding: 45px; }
-        
-        .flashlight { position: absolute; inset: 0; background: radial-gradient(circle 200px at var(--x, -1000px) var(--y, -1000px), var(--card-glow) 0%, rgba(0,0,0,1) 100%); z-index: 2; pointer-events: none; mix-blend-mode: lighten; }
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.92); z-index: 1; pointer-events: none; transition: opacity 0.5s; }
-        .card:hover .overlay { opacity: 0.15; }
-        
-        .gym { --card-glow: var(--gym-glow); }
-        .rest { --card-glow: var(--rest-glow); }
-        .content { position: relative; z-index: 3; width: 100%; }
-        
-        h2 { font-family: 'Bebas Neue', cursive; font-size: 3.2rem; line-height: 0.85; color: #fff; margin-bottom: 5px; }
-        .p-label { font-size: 0.6rem; color: rgba(255,255,255,0.3); text-transform: uppercase; }
-        .p-value { font-family: 'Bebas Neue', cursive; font-size: 1.6rem; color: #fff; }
-        
-        .stat-row { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
-        .stat { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
-        .label { color: #222; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; }
-        .value { font-family: 'Bebas Neue', cursive; font-size: 1.8rem; color: #1a1a1a; transition: 0.3s; }
-        
-        .stat:hover .label, .stat:hover .value { color: #fff !important; }
-        .bg-icon { position: absolute; right: -10px; bottom: -10px; width: 200px; height: 200px; opacity: 0.03; color: #fff; z-index: 1; }
-
-        @media (max-width: 900px) { .container { flex-direction: column; } .info-card { width: 100%; } }
+        .chart-wrapper { position: relative; width: 100%; max-width: 280px; margin: 0 auto; }
     </style>
 </head>
 <body>
 
-    <div id="error-toast">
-        <i data-lucide="alert-circle" class="error-icon"></i>
-        <span class="error-text">Lütfen İstenilen Bilgileri Eksiksiz Girin!</span>
+<div class="container">
+    <div id="ui-setup">
+        <header>
+            <span class="brand">Pro Nutrition Logic</span>
+            <h1>Analiz Sistemi.</h1>
+        </header>
+        
+        <div class="field-group">
+            <div><label>İsim</label><input type="text" id="name" placeholder="Eray Yılmaz"></div>
+            <div>
+                <label>Cinsiyet</label>
+                <select id="gen" onchange="toggleThemes()">
+                    <option value="none">Seçiniz</option>
+                    <option value="male">Erkek</option>
+                    <option value="female">Kadın</option>
+                </select>
+            </div>
+            <div id="t-wrap" style="display:none;">
+                <label>Tema</label>
+                <select id="t-pick" onchange="applyT()"></select>
+            </div>
+        </div>
+
+        <div class="field-group">
+            <div><label>Kilo (kg)</label><input type="number" id="w"></div>
+            <div><label>Boy (cm)</label><input type="number" id="h"></div>
+            <div><label>Yaş</label><input type="number" id="a"></div>
+        </div>
+
+        <div class="field-group">
+            <div>
+                <label>Egzersiz Frekansı</label>
+                <select id="freq">
+                    <option value="1.2">1-2 Gün (Sedanter)</option>
+                    <option value="1.4" selected>3-4 Gün (Orta)</option>
+                    <option value="1.6">5-6 Gün (Aktif)</option>
+                    <option value="1.8">Profesyonel / Ağır</option>
+                </select>
+            </div>
+            <div>
+                <label>Antrenman Türü</label>
+                <select id="style">
+                    <option>Ağırlık Antrenmanı</option>
+                    <option>Kardiyo</option>
+                    <option>Vücut Ağırlığı</option>
+                    <option>HIIT</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card" onclick="setG(this, 'fat')"><h3>Defisit</h3><p>Yağ Yakımı</p></div>
+            <div class="card" onclick="setG(this, 'muscle')"><h3>Surplus</h3><p>Kas Artışı</p></div>
+            <div class="card" onclick="setG(this, 'recomp')"><h3>Denge</h3><p>Koruma</p></div>
+        </div>
+
+        <button class="btn btn-main" onclick="calc()">Raporu Hazırla</button>
     </div>
 
-    <div id="setup-screen">
-        <h1 style="font-family: 'Bebas Neue'; font-size: 2.2rem; color: var(--accent); margin-bottom: 25px; text-align: center;">PARAMETRE GİRİŞİ</h1>
-        
-        <div class="input-group"><label>İsim</label><input type="text" id="userName" placeholder="Örn: Berkay"></div>
-        
-        <div style="display: flex; gap: 15px;">
-            <div class="input-group" style="flex:1;"><label>Kilo (kg)</label><input type="number" id="userWeight"></div>
-            <div class="input-group" style="flex:1;"><label>Boy (cm)</label><input type="number" id="userHeight"></div>
-            <div class="input-group" style="flex:1;"><label>Yaş</label><input type="number" id="userAge"></div>
-        </div>
+    <div id="ui-result">
+        <div id="report-area">
+            <div class="info-side">
+                <span class="brand">Biyometrik Sonuçlar</span>
+                <div class="big-val" id="out-cal">0</div>
+                
+                <div class="macro-container">
+                    <div class="macro-box"><label style="color:var(--prot)">Protein</label><h3 id="out-p" style="color:var(--prot)">0</h3></div>
+                    <div class="macro-box"><label style="color:var(--fat)">Yağ</label><h3 id="out-f" style="color:var(--fat)">0</h3></div>
+                    <div class="macro-box"><label style="color:var(--carb)">Karb</label><h3 id="out-c" style="color:var(--carb)">0</h3></div>
+                </div>
 
-        <div class="input-group">
-            <label>Cinsiyet</label>
-            <select id="userGender"><option value="male">Erkek</option><option value="female">Kadın</option></select>
-        </div>
-
-        <div class="input-group">
-            <label>Hareket Düzeyi</label>
-            <select id="userActivity">
-                <option value="1.2">Masa Başı / Hareketsiz</option>
-                <option value="1.375">Hafif Hareketli (Haftada 1-3 antrenman)</option>
-                <option value="1.55">Orta Hareketli (Haftada 3-5 antrenman)</option>
-                <option value="1.725">Çok Hareketli (Haftada 6-7 ağır antrenman)</option>
-                <option value="1.9">Profesyonel Sporcu / Fiziksel İş</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label>Ana Hedef</label>
-            <select id="userGoal">
-                <option value="-500">Yağ Yakımı (-500 Deficit)</option>
-                <option value="0">Formu Koru (Maintain)</option>
-                <option value="300">Temiz Kas Kazanımı (+300 Surplus)</option>
-                <option value="600">Maksimum Hacim (+600 Surplus)</option>
-            </select>
-        </div>
-
-        <button class="btn-calc" onclick="initializeSystem()">ANALİZİ TAMAMLA</button>
-    </div>
-
-    <div id="dashboard">
-        <div class="main-wrapper">
-            <div class="card profile-card">
-                <div class="content">
-                    <span style="color:var(--accent); font-size:0.6rem; letter-spacing:2px; font-weight:800;">PROTOKOL ÖZETİ</span>
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
-                        <h2 id="display-name">OPERATÖR</h2>
-                        <div style="display:flex; gap:25px;">
-                            <div class="profile-item"><span class="p-label" id="balance-label">Enerji Dengesi</span><br><span class="p-value" id="display-balance" style="color: var(--accent);">0</span></div>
-                            <div class="profile-item"><span class="p-label">Bakım Kalorisi</span><br><span class="p-value" id="display-tdee">0</span></div>
-                            <div class="profile-item"><span class="p-label">Bazal Met.</span><br><span class="p-value" id="display-bmr">0</span></div>
-                        </div>
-                    </div>
+                <div class="logic-panel">
+                    <div class="logic-item"><h5>Günlük İhtiyaç (TDEE)</h5><p id="l-tdee"></p></div>
+                    <div class="logic-item"><h5>Değişim Stratejisi</h5><p id="l-diff"></p></div>
+                    <div class="logic-item"><h5>Analitik Mantık</h5><p id="l-reason"></p></div>
                 </div>
             </div>
 
-            <div class="container">
-                <div class="card info-card gym">
-                    <i data-lucide="zap" class="bg-icon"></i>
-                    <div class="flashlight"></div><div class="overlay"></div>
-                    <div class="content">
-                        <h2>ANTRENMAN</h2>
-                        <div class="stat-row" id="gym-stats"></div>
-                    </div>
+            <div class="chart-side" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <div class="chart-wrapper">
+                    <canvas id="macroChart"></canvas>
                 </div>
-
-                <div class="card info-card rest">
-                    <i data-lucide="coffee" class="bg-icon"></i>
-                    <div class="flashlight"></div><div class="overlay"></div>
-                    <div class="content">
-                        <h2>DİNLENME</h2>
-                        <div class="stat-row" id="rest-stats"></div>
-                    </div>
+                <div style="margin-top:25px; text-align:center;">
+                    <label>Sporcu Kimliği</label>
+                    <p id="r-name" style="font-size:18px; font-weight:800; text-transform:uppercase;"></p>
                 </div>
             </div>
-            <button class="btn-calc" style="background: #111; font-size: 0.6rem; opacity: 0.5;" onclick="location.reload()">YENİ PROFİL OLUŞTUR</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-main" onclick="exportFile('pdf')">PDF İndir</button>
+            <button class="btn btn-main" style="background:transparent; color:#fff; border:1px solid var(--border);" onclick="exportFile('img')">Görsel Kaydet</button>
+            <button class="btn btn-main" style="background:#333; color:#fff;" onclick="location.reload()">Yeni Analiz</button>
         </div>
     </div>
+</div>
 
 <script>
-    lucide.createIcons();
+    let goal = null, chart = null;
+    Chart.register(ChartDataLabels);
 
-    // --- HATA MESAJI FONKSİYONU ---
-    function showError() {
-        const toast = document.getElementById('error-toast');
-        toast.classList.add('show');
-        
-        // 2 saniye sonra geri çek
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2000);
+    function setG(el, g) { 
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected')); 
+        el.classList.add('selected'); 
+        goal = g; 
     }
 
-    function createStat(label, value) {
-        return `<div class="stat"><span class="label">${label}</span><span class="value">${value}</span></div>`;
-    }
-
-    function initializeSystem() {
-        const weight = parseFloat(document.getElementById('userWeight').value);
-        const height = parseFloat(document.getElementById('userHeight').value);
-        const age = parseInt(document.getElementById('userAge').value);
-        const activity = parseFloat(document.getElementById('userActivity').value);
-        const goalBonus = parseInt(document.getElementById('userGoal').value);
-        const gender = document.getElementById('userGender').value;
-
-        // EKSİK VERİ KONTROLÜ (ALERT YERİNE TOAST)
-        if(!weight || !height || !age) {
-            showError();
-            return;
-        }
-
-        // 1. BMR
-        let bmr = (10 * weight) + (6.25 * height) - (5 * age);
-        bmr = (gender === 'male') ? bmr + 5 : bmr - 161;
-
-        // 2. TDEE
-        const tdee = bmr * activity;
-        
-        // 3. Enerji Dengesi Yazısı Ayarı
-        const balanceElement = document.getElementById('display-balance');
-        const balanceLabel = document.getElementById('balance-label');
-        if (goalBonus < 0) {
-            balanceLabel.innerText = "Kalori Açığı";
-            balanceElement.innerText = goalBonus + " KCAL";
-            balanceElement.style.color = "#ff3c00"; 
-        } else if (goalBonus > 0) {
-            balanceLabel.innerText = "Kalori Fazlası";
-            balanceElement.innerText = "+" + goalBonus + " KCAL";
-            balanceElement.style.color = "#00f2ff"; 
-        } else {
-            balanceLabel.innerText = "Denge Modu";
-            balanceElement.innerText = "STABİL";
-            balanceElement.style.color = "#fff";
-        }
-
-        // 4. Kalori Hesapları
-        const trainingCal = Math.round(tdee + goalBonus);
-        const restCal = Math.round(bmr * activity * 0.85 + (goalBonus * 0.5)); 
-
-        // 5. Makrolar
-        const protein = weight * 2.2;
-        const fat = weight * 0.9;
-        const calcCarbs = (cal) => Math.round((cal - (protein * 4) - (fat * 9)) / 4);
-
-        // UI Güncelleme
-        document.getElementById('display-name').innerText = (document.getElementById('userName').value || "MİSAFİR").toUpperCase();
-        document.getElementById('display-bmr').innerText = Math.round(bmr) + " KCAL";
-        document.getElementById('display-tdee').innerText = Math.round(tdee) + " KCAL";
-
-        document.getElementById('gym-stats').innerHTML = 
-            createStat("Hedef Kalori", trainingCal + " KCAL") +
-            createStat("Protein", Math.round(protein) + " GR") +
-            createStat("Yağ", Math.round(fat) + " GR") +
-            createStat("Karbonhidrat", calcCarbs(trainingCal) + " GR");
-
-        document.getElementById('rest-stats').innerHTML = 
-            createStat("Hedef Kalori", restCal + " KCAL") +
-            createStat("Protein", Math.round(protein * 0.85) + " GR") +
-            createStat("Yağ", Math.round(fat) + " GR") +
-            createStat("Karbonhidrat", calcCarbs(restCal) + " GR");
-
-        document.getElementById('setup-screen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        setTimeout(() => { document.getElementById('dashboard').style.opacity = '1'; }, 50);
-    }
-
-    // Kart animasyonları
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty('--x', (e.clientX - rect.left) + 'px');
-            card.style.setProperty('--y', (e.clientY - rect.top) + 'px');
-            card.style.transform = `rotateX(${(rect.height/2 - (e.clientY - rect.top))/25}deg) rotateY(${( (e.clientX - rect.left) - rect.width/2)/25}deg) scale3d(0.98, 0.98, 0.98)`;
+    function toggleThemes() {
+        const g = document.getElementById('gen').value; 
+        const w = document.getElementById('t-wrap'); 
+        const p = document.getElementById('t-pick');
+        if(g === "none") { w.style.display="none"; return; }
+        w.style.display="block"; p.innerHTML = "";
+        const t = { male: ["#ffffff", "#3b82f6", "#00ff88"], female: ["#ffffff", "#ff0077", "#D4AF37"] };
+        t[g].forEach((c, i) => { 
+            let o = document.createElement('option'); 
+            o.value=c; 
+            o.innerText=`Tema ${i+1}`; 
+            p.appendChild(o); 
         });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            card.style.setProperty('--x', '-1000px');
+        applyT();
+    }
+
+    function applyT() { 
+        const c = document.getElementById('t-pick').value; 
+        document.documentElement.style.setProperty('--accent', c); 
+    }
+
+    function calc() {
+        if(!goal) return alert("Lütfen bir hedef seçin!");
+        const w = +document.getElementById('w').value, 
+              h = +document.getElementById('h').value, 
+              a = +document.getElementById('a').value, 
+              f = +document.getElementById('freq').value, 
+              g = document.getElementById('gen').value,
+              name = document.getElementById('name').value;
+
+        if(!w || !h || !a || g === "none") return alert("Lütfen tüm alanları doldurun!");
+
+        // Mifflin-St Jeor Formülü
+        let bmr = (10 * w) + (6.25 * h) - (5 * a) + (g === 'female' ? -161 : 5);
+        let tdee = bmr * f;
+        let final, p, fa, c, dTxt, rTxt;
+
+        if (goal === 'fat') { 
+            final = tdee - 500; p = w * 2.2; fa = w * 0.7; 
+            dTxt = "-500 kcal açık uygulandı."; 
+            rTxt = "Yağ yakımı odaklı, kas koruyucu yüksek protein dengesi."; 
+        }
+        else if (goal === 'muscle') { 
+            final = tdee + 300; p = w * 1.8; fa = w * 0.8; 
+            dTxt = "+300 kcal sürplus eklendi."; 
+            rTxt = "Kas hipertrofisi için optimize edilmiş kontrollü enerji artışı."; 
+        }
+        else { 
+            final = tdee; p = w * 2.0; fa = w * 0.8; 
+            dTxt = "Kalori dengesi korundu."; 
+            rTxt = "Vücut kompozisyonunu iyileştirme ve mevcut kütleyi koruma."; 
+        }
+        
+        c = (final - (p*4 + fa*9)) / 4;
+
+        document.getElementById('ui-setup').style.display='none';
+        document.getElementById('ui-result').classList.add('active');
+        document.getElementById('out-cal').innerText = Math.round(final) + " kcal";
+        document.getElementById('out-p').innerText = Math.round(p) + "g";
+        document.getElementById('out-f').innerText = Math.round(fa) + "g";
+        document.getElementById('out-c').innerText = Math.round(c) + "g";
+        document.getElementById('l-tdee').innerText = `${Math.round(tdee)} kcal (Bakım)`;
+        document.getElementById('l-diff').innerText = dTxt;
+        document.getElementById('l-reason').innerText = rTxt;
+        document.getElementById('r-name').innerText = name || "Elite Athlete";
+        
+        const ctx = document.getElementById('macroChart').getContext('2d');
+        if(chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Protein', 'Yağ', 'Karb'],
+                datasets: [{
+                    data: [Math.round(p*4), Math.round(fa*9), Math.round(c*4)],
+                    backgroundColor: ['#4ade80', '#facc15', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: '800', size: 10 },
+                        formatter: (val, ctx) => ctx.chart.data.labels[ctx.dataIndex]
+                    }
+                }
+            }
         });
-    });
+    }
+
+    async function exportFile(t) {
+        const area = document.getElementById('report-area');
+        const canvas = await html2canvas(area, {backgroundColor:'#000', scale:2});
+        if(t==='img'){ 
+            let l=document.createElement('a'); l.download='Analiz-Raporu.png'; 
+            l.href=canvas.toDataURL(); l.click(); 
+        }
+        else { 
+            const {jsPDF}=window.jspdf; 
+            const p=new jsPDF('l','mm','a4'); 
+            p.addImage(canvas.toDataURL('image/png'),'PNG',10,10,277,0); 
+            p.save("Analiz-Raporu.pdf"); 
+        }
+    }
 </script>
 </body>
 </html>
